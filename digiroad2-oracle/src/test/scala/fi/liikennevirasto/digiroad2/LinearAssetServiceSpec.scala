@@ -1056,4 +1056,4 @@ class LinearAssetServiceSpec extends FunSuite with Matchers {
     (yesterday + 24*60*60*1000L) should be (today)
   }
 
-}
+  }

@@ -218,7 +218,17 @@ object PointAssetOperations {
   }
 
   def isFloating(persistedAsset: PersistedPointAsset, roadLink: Option[(Int, Seq[Point])]): Boolean = {
+    val logger = LoggerFactory.getLogger(getClass)
+    logger.info("Float check: RoadLink = " + roadLink)
     val point = Point(persistedAsset.lon, persistedAsset.lat)
+    if (roadLink.nonEmpty) {
+      logger.info("Float check: municipality %d <=> %d".format(roadLink.get._1, persistedAsset.municipalityCode))
+      val refPoint = GeometryUtils.calculatePointFromLinearReference(roadLink.get._2, persistedAsset.mValue)
+      if (refPoint.nonEmpty)
+        logger.info("Float check: distance (%.3f,%.3f) <-> (%.3f,%.3f) = %.3f ".format(point.x, point.y, refPoint.get.x, refPoint.get.y, point.distance2DTo(refPoint.get)))
+      else
+        logger.info("Float check: Reference Point is empty!")
+    }
     roadLink match {
       case None => true
       case Some((municipalityCode, geometry)) => municipalityCode != persistedAsset.municipalityCode ||
